@@ -3,8 +3,9 @@
 Tested for:
 - cpuminer-gr-avx2:1.2.4.1
 
-##### Change <config> file 
+##### Change config file 
 ```
+# cat config
 export URL="
         192.168.5.4:5555|rig01
         192.168.5.2:5555|rig03
