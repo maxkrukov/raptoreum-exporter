@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#URL
+. /raptoreum-exporter/config
+
+gr() {
+  a=$(curl --silent --http0.9  ${1//|*}/summary | tr -d '\0'| tr ';' '\n' | tr -d '|')
+  labels="rigcpu=\"${1//*|}\""
+  if (echo $a | grep -q 'ALGO=gr'); then
+    while read line; do
+      . <(echo $line)
+    done <<< $a
+
+    labels="$labels version=\"$VER\" pool=\"$URL\""
+    echo "CPUS{$labels} $CPUS"
+    echo "hashrate{$labels} $HS"
+    echo "accepted{$labels} $ACC"
+    echo "rejected{$labels} $REJ"
+    echo "stale{$labels} $SOL"
+    echo "temperature{$labels} $TEMP"
+    echo "uptime{$labels} $UPTIME"
+    echo "freq{$labels} $FREQ"
+    echo "diff{$labels} $DIFF"
+  else
+    echo "uptime{$labels} 0"
+  fi
+}
+
+
+echo "# TYPE uptime counter"
+echo "# TYPE CPUS gauge"
+echo "# TYPE hashrate gauge"
+echo "# TYPE accepted counter"
+echo "# TYPE rejected counter"
+echo "# TYPE stale counter"
+echo "# TYPE temperature gauge"
+echo "# TYPE freq gauge"
+echo "# TYPE diff gauge"
+
+for url in $URL; do
+  labels="${labels} url=\"${url}\""
+  gr $url
+done
